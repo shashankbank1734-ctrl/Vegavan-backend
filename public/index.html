@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vegavan AI Chatbot - Live Demo</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #09090b;
+      color: #fafafa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      padding: 32px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      background: linear-gradient(to right, #ffffff, #a1a1aa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p {
+      color: #a1a1aa;
+      font-size: 15px;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .btn {
+      display: inline-block;
+      background: white;
+      color: black;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .btn:hover {
+      transform: scale(1.02);
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Vegavan AI Chatbot Live Demo</h1>
+    <p>This is your live external HTML testing page. Click the chat launcher bubble in the bottom right corner, fill in the <strong>Name & Phone Pre-chat Form</strong>, and watch the lead appear in real-time inside your SaaS Dashboard panel!</p>
+    <a href="/dashboard" class="btn" id="dashboard-btn">Back to SaaS Dashboard</a>
+  </div>
+
+  <script>
+    // Dynamically update the "Back to SaaS Dashboard" button based on the referrer
+    if (document.referrer) {
+      try {
+        const url = new URL(document.referrer);
+        const dashboardBtn = document.getElementById('dashboard-btn');
+        if (dashboardBtn) {
+          dashboardBtn.href = `${url.origin}/dashboard`;
+        }
+      } catch (err) {
+        console.warn('Unable to resolve referrer origin:', err);
+      }
+    }
+  </script>
+
+  <!-- Embedded Chatbot Widget -->
+  <script src="/chatbot.js" data-user-id="69fad2cb361347e3ca9d17fc"></script>
+</body>
+</html>
