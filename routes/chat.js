@@ -41,48 +41,56 @@ const getRelevantKnowledge = (message, knowledgeBlocks) => {
   return relevant.slice(0, 5).join('\n\n'); // Return up to 5 most relevant blocks
 };
 
-// Query helper for Groq (Llama 3.3)
-const queryGroq = async (message, systemPrompt, history) => {
+// Query helper for Groq
+const queryGroq = async (message, systemPrompt, history = []) => {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     console.error('Groq Error: GROQ_API_KEY is not defined.');
     return null;
   }
 
-  try {
-    const formattedMessages = [
-      { role: 'system', content: systemPrompt },
-      ...history,
-      { role: 'user', content: message }
-    ];
+  const candidateModels = [
+    process.env.GROQ_MODEL,
+    'openai/gpt-oss-120b',
+    'openai/gpt-oss-20b',
+    'qwen/qwen3.8-27b'
+  ].filter(Boolean);
 
-    console.log('Querying Groq with formatted messages count:', formattedMessages.length);
+  const formattedMessages = [
+    { role: 'system', content: systemPrompt },
+    ...history,
+    { role: 'user', content: message }
+  ];
 
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        messages: formattedMessages,
-        temperature: 0.2
-      })
-    });
+  for (const model of candidateModels) {
+    try {
+      console.log(`Querying Groq with model ${model}, formatted messages count: ${formattedMessages.length}`);
 
-    const data = await res.json();
-    if (res.ok && data.choices && data.choices[0]) {
-      return data.choices[0].message.content;
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: formattedMessages,
+          temperature: 0.2
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.choices && data.choices[0] && data.choices[0].message) {
+        return data.choices[0].message.content;
+      }
+
+      console.error(`Groq API Error Status on ${model}:`, res.status, data.error ? data.error.message : data);
+    } catch (err) {
+      console.error(`Groq Error Exception on ${model}:`, err);
     }
-
-    console.error('Groq API HTTP Error Status:', res.status, res.statusText);
-    console.error('Groq API Error Response Data:', JSON.stringify(data, null, 2));
-    return null;
-  } catch (err) {
-    console.error('Groq Error Exception:', err);
-    return null;
   }
+
+  return null;
 };
 
 const extractActualUrl = (link) => {
